@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Lead Dashboard - All Companies{% endblock %}
+
+{% block content %}
+<header>
+    <h1>📊 Lead Scraper Dashboard</h1>
+    <p class="header-subtitle">Manage and view all scraped company leads</p>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ total }}</div>
+            <div class="stat-label">Total Companies</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ companies|selectattr('emails')|list|length }}</div>
+            <div class="stat-label">Companies with Emails</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ companies|selectattr('phones')|list|length }}</div>
+            <div class="stat-label">Companies with Phones</div>
+        </div>
+    </div>
+</header>
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search companies by name or website...">
+    <button onclick="filterCompanies()">Search</button>
+</div>
+
+<h2>Search Companies</h2>
+
+<input type="text" id="query" placeholder="Enter keywords">
+<input type="number" id="num" value="5" min="1">
+
+<button onclick="runSearch()">Search & Scrape</button>
+
+<script>
+async function runSearch() {
+    const query = document.getElementById("query").value;
+    const num = document.getElementById("num").value;
+
+    const res = await fetch("/search", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: query, num_results: num})
+    });
+
+    const data = await res.json();
+    alert(data.message + " (" + data.total_urls + " sites)");
+
+    location.reload(); // refresh dashboard
+}
+</script>
+
+
+{% if companies %}
+    <div class="companies-grid">
+        {% for company in companies %}
+        <div class="company-card">
+            <div class="company-name">{{ company.name|replace('.in', '.in')|replace('.com', '.com')|replace('.org', '.org')|title }}</div>
+            
+            <div class="company-info">
+                {% if company.website %}
+                <div class="info-item">
+                    <span class="info-icon">🌐</span>
+                    <a href="{{ company.website }}" target="_blank" class="company-website">{{ company.website }}</a>
+                </div>
+                {% endif %}
+                
+                {% if company.description %}
+                <div class="info-item">
+                    <span class="info-icon">📝</span>
+                    <span>{{ company.description[:80] }}{% if company.description|length > 80 %}...{% endif %}</span>
+                </div>
+                {% endif %}
+                
+                {% if company.emails %}
+                <div class="info-item">
+                    <span class="info-icon">✉️</span>
+                    <span>{{ company.emails|length }} email(s)</span>
+                </div>
+                {% endif %}
+                
+                {% if company.phones %}
+                <div class="info-item">
+                    <span class="info-icon">📞</span>
+                    <span>{{ company.phones|length }} phone(s)</span>
+                </div>
+                {% endif %}
+                
+                {% if company.services %}
+                <div class="info-item">
+                    <span class="info-icon">💼</span>
+                    <span>{{ company.services|length }} service(s)</span>
+                </div>
+                {% endif %}
+                
+                {% if company.team %}
+                <div class="info-item">
+                    <span class="info-icon">👥</span>
+                    <span>{{ company.team|length }} team member(s)</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="badges">
+                {% if company.emails %}
+                    <span class="badge has-data">✓ Emails</span>
+                {% else %}
+                    <span class="badge no-data">✗ No Emails</span>
+                {% endif %}
+                
+                {% if company.phones %}
+                    <span class="badge has-data">✓ Phones</span>
+                {% else %}
+                    <span class="badge no-data">✗ No Phones</span>
+                {% endif %}
+                
+                {% if company.team %}
+                    <span class="badge has-data">✓ Team Info</span>
+                {% else %}
+                    <span class="badge no-data">✗ No Team</span>
+                {% endif %}
+            </div>
+            
+            <a href="/company/{{ company.name }}" class="view-btn">View Details →</a>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-companies">
+        <h2>No companies found</h2>
+        <p>No scraped data available yet. Run the scraper first.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

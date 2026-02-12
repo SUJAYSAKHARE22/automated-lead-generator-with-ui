@@ -1,0 +1,11 @@
+Flask==2.3.3
+Werkzeug==2.3.7
+requests
+beautifulsoup4
+lxml
+ddgs
+sentence-transformers
+torch
+numpy
+scikit-learn
+scipy

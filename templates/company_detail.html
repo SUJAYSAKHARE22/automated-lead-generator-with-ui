@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }} - Company Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .detail-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .detail-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .description-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 5px;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .service-list {
+        list-style: none;
+    }
+
+    .service-list li {
+        padding: 10px;
+        margin: 8px 0;
+        background: #f9f9f9;
+        border-left: 3px solid #667eea;
+        border-radius: 3px;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .team-member {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .team-position {
+        font-weight: bold;
+        color: #667eea;
+        font-size: 14px;
+    }
+
+    .team-name {
+        margin-top: 5px;
+        color: #333;
+        font-size: 16px;
+    }
+
+    .contact-item {
+        padding: 12px;
+        margin: 8px 0;
+        background: #f0f7ff;
+        border-radius: 5px;
+        border-left: 3px solid #667eea;
+        word-break: break-all;
+    }
+
+    .contact-label {
+        font-weight: bold;
+        color: #667eea;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .contact-value {
+        margin-top: 5px;
+        color: #333;
+    }
+
+    .contact-value a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .contact-value a:hover {
+        text-decoration: underline;
+    }
+
+    .sidebar {
+        height: fit-content;
+    }
+
+    .copy-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+
+    .copy-btn:hover {
+        background: #764ba2;
+    }
+
+    .raw-content {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        color: #333;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        opacity: 0.9;
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 20px;
+        color: #999;
+        font-style: italic;
+    }
+
+    .info-box {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 3px solid #2196f3;
+    }
+
+    .info-box-title {
+        color: #1976d2;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .info-box-content {
+        color: #555;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">← Back to Dashboard</a>
+
+<div class="detail-header">
+    <h1>{{ company.name|replace('.in', '.in')|replace('.com', '.com')|replace('.org', '.org')|title }}</h1>
+    <p class="header-subtitle">Detailed company information and leads</p>
+</div>
+
+<div class="detail-content">
+    <div>
+        <!-- Company Details -->
+        <div class="section">
+            <div class="section-title">🏢 Company Details</div>
+            
+            {% if company.website %}
+            <div class="contact-item">
+                <div class="contact-label">Website</div>
+                <div class="contact-value">
+                    <a href="{{ company.website }}" target="_blank">{{ company.website }}</a>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if company.description %}
+            <div class="section">
+                <div class="section-title">📝 Description</div>
+                <div class="description-box">{{ company.description }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Services & Products -->
+        {% if company.services %}
+        <div class="section">
+            <div class="section-title">💼 Services & Products</div>
+            {% if company.services %}
+                <ul class="service-list">
+                    {% for service in company.services %}
+                    <li>{{ service }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">No services information found</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Team & Leadership -->
+        {% if company.team %}
+        <div class="section">
+            <div class="section-title">👥 Team & Leadership</div>
+            {% if company.team %}
+                <div class="team-grid">
+                    {% for position, name in company.team.items() %}
+                    <div class="team-member">
+                        <div class="team-position">{{ position }}</div>
+                        <div class="team-name">{{ name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">No team information found</div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Contact Information -->
+        <div class="section">
+            <div class="section-title">📞 Contact Information</div>
+            
+            {% if company.emails %}
+            <div>
+                <h3 style="color: #667eea; margin-bottom: 10px;">Email Addresses</h3>
+                {% for email in company.emails %}
+                <div class="contact-item">
+                    <div class="contact-value">
+                        <a href="mailto:{{ email }}">{{ email }}</a>
+                        <button class="copy-btn" onclick="copyToClipboard('{{ email }}')">Copy</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">No email addresses found</div>
+            {% endif %}
+            
+            {% if company.phones %}
+            <div style="margin-top: 20px;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">Phone Numbers</h3>
+                {% for phone in company.phones %}
+                <div class="contact-item">
+                    <div class="contact-value">
+                        <a href="tel:{{ phone }}">{{ phone }}</a>
+                        <button class="copy-btn" onclick="copyToClipboard('{{ phone }}')">Copy</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">No phone numbers found</div>
+            {% endif %}
+        </div>
+
+        <!-- Statistics -->
+        <div class="section">
+            <div class="section-title">📊 Statistics</div>
+            <div style="line-height: 2;">
+                <p><strong>Emails Found:</strong> {{ company.emails|length }}</p>
+                <p><strong>Phones Found:</strong> {{ company.phones|length }}</p>
+                <p><strong>Services Listed:</strong> {{ company.services|length }}</p>
+                <p><strong>Team Members:</strong> {{ company.team|length }}</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="section">
+            <div class="action-buttons">
+                <a href="/" class="btn btn-secondary">← Back</a>
+                <a href="/" class="btn btn-primary">View All</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Raw Content (Optional, hidden by default) -->
+<details style="margin-top: 30px;">
+    <summary style="padding: 15px; background: white; border-radius: 10px; cursor: pointer; font-weight: bold;">
+        📄 View Raw Data
+    </summary>
+    <div class="section" style="margin-top: 10px;">
+        <div class="raw-content">{{ company.raw_content }}</div>
+    </div>
+</details>
+
+{% endblock %}
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard: ' + text);
+    }).catch(() => {
+        alert('Failed to copy');
+    });
+}
+</script>
